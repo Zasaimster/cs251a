@@ -1,0 +1,6 @@
+[submodule "gem5"]
+	path = gem5
+	url = https://github.com/gem5/gem5.git
+[submodule "hw1/cs251a-microbench"]
+	path = hw1/cs251a-microbench
+	url = https://github.com/PolyArch/cs251a-microbench.git
