@@ -56,7 +56,8 @@ from m5.util import (
 
 from gem5.isas import ISA
 
-addToPath("../../")
+addToPath("../../gem5/configs")
+
 from common import (
     CacheConfig,
     CpuConfig,
@@ -69,6 +70,7 @@ from common.Caches import *
 from common.cpu2000 import *
 from common.FileSystemConfig import config_filesystem
 from ruby import Ruby
+
 
 def get_processes(args):
     """Interprets provided args and returns a list of processes"""
@@ -238,13 +240,13 @@ if args.simpoint_profile:
 
 for i in range(np):
     # fetch/decode/rename/dispatch/issue/wb/commit
-    system.cpu[i].issueWidth = 8
-    system.cpu[i].fetchWidth = 8
-    system.cpu[i].decodeWidth = 8
-    system.cpu[i].renameWidth = 8
-    system.cpu[i].dispatchWidth = 8
-    system.cpu[i].wbWidth = 8
-    system.cpu[i].commitWidth = 8
+    system.cpu[i].fetchWidth = 2
+    system.cpu[i].issueWidth = 2
+    system.cpu[i].decodeWidth = 2
+    system.cpu[i].renameWidth = 2
+    system.cpu[i].dispatchWidth = 2
+    system.cpu[i].wbWidth = 2
+    system.cpu[i].commitWidth = 2
     
     if args.smt:
         system.cpu[i].workload = multiprocesses

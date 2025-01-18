@@ -56,7 +56,7 @@ from m5.util import (
 
 from gem5.isas import ISA
 
-addToPath("../../")
+addToPath("../../gem5/configs")
 
 from common import (
     CacheConfig,
@@ -239,11 +239,14 @@ if args.simpoint_profile:
         fatal("SimPoint generation not supported with more than one CPUs")
 
 for i in range(np):
-    # system.cpu[i].issueWidth = 8 this doesn't exist for this cpu type
-    system.cpu[i].decodeInputWidth = 8
-    system.cpu[i].executeInputWidth = 8
-    system.cpu[i].executeIssueLimit = 8
-    system.cpu[i].executeCommitLimit = 8
+    # fetch/decode/rename/dispatch/issue/wb/commit
+    system.cpu[i].issueWidth = 8
+    system.cpu[i].fetchWidth = 8
+    system.cpu[i].decodeWidth = 8
+    system.cpu[i].renameWidth = 8
+    system.cpu[i].dispatchWidth = 8
+    system.cpu[i].wbWidth = 8
+    system.cpu[i].commitWidth = 8
     
     if args.smt:
         system.cpu[i].workload = multiprocesses
