@@ -245,8 +245,8 @@ for i in range(np):
     system.cpu[i].decodeWidth = 2
     system.cpu[i].renameWidth = 2
     system.cpu[i].dispatchWidth = 2
-    system.cpu[i].wbWidth = 2
-    system.cpu[i].commitWidth = 2
+    # system.cpu[i].wbWidth = 2
+    # system.cpu[i].commitWidth = 2
     
     if args.smt:
         system.cpu[i].workload = multiprocesses
