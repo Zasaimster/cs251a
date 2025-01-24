@@ -30,8 +30,7 @@ def compare_stat(stat_name, data_source: pd.DataFrame):
         rot=0,
         figsize=(10, 10)
     )
-    # ax.figure.savefig(f'hw1/figures/{stat_name}.png') # Maxwell's setup, think this should just be changed though
-    ax.figure.savefig(f'figures/{stat_name}.png')
+    ax.figure.savefig(f'{workspace_dir}/hw1/figures/{stat_name}.png')
 
 
 def parse_stat_files():
