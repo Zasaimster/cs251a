@@ -1,7 +1,8 @@
 import os
 import pandas as pd
 
-workspace_dir = "/workspaces/cs251a"
+# workspace_dir = "/workspaces/cs251a" # Maxwell's setup
+workspace_dir = "/root/cs251a" # Saim's setup
 results_dir = os.path.join(workspace_dir, "hw1/results")
 stat_file = "stats.txt"
 benchmarks = ["lfsr", "merge", "mm", "sieve", "spmv"]
@@ -14,6 +15,8 @@ def main():
     
     compare_stat(stat_name="hostInstRate", data_source=all_data)
     compare_stat(stat_name="system.cpu.ipc", data_source=all_data)
+    compare_stat(stat_name="hostSeconds", data_source=all_data)
+    compare_stat(stat_name="system.mem_ctrls.dram.readBursts", data_source=all_data)
 
 
 def compare_stat(stat_name, data_source: pd.DataFrame):
@@ -27,7 +30,7 @@ def compare_stat(stat_name, data_source: pd.DataFrame):
         rot=0,
         figsize=(10, 10)
     )
-    ax.figure.savefig(f'hw1/figures/{stat_name}.png')
+    ax.figure.savefig(f'{workspace_dir}/hw1/figures/{stat_name}.png')
 
 
 def parse_stat_files():
