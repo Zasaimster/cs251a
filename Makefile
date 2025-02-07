@@ -1,4 +1,19 @@
+WORKSPACE := /workspaces/cs251a
+BUILD_DIR := ${WORKSPACE}/build
+HW1_DIR := ${WORKSPACE}/hw1
+HW2_DIR := ${WORKSPACE}/hw2
+
+OPT ?= -O0
+CFLAGS := -std=gnu11 $(OPT) -Wall -Wextra -Wpedantic -Wstrict-aliasing -static
+
 hw1: FORCE
 	./hw1/benchmark.sh
 
+hw2: FORCE
+	mkdir -p ${BUILD_DIR}/hw2
+	x86_64-linux-gnu-gcc ${HW2_DIR}/test.c -o ${BUILD_DIR}/hw2/test ${CFLAGS}
+
 FORCE: ;
+
+clean:
+	@rm -rf $(BUILD_DIR)
