@@ -12,7 +12,9 @@ $GEM5_X86 ${BUILD_CONFIG_DIR}/se.py  --cmd=${BM_DIR}/${bm} \
     --cpu-type=DerivO3CPU --sys-clock=2GHz --cpu-clock=2GHz --mem-type=DDR3_1600_8x8 \
     --caches --l1d_size=64KiB --l1i_size=64KiB --l2cache --l2_size=2MiB
 
-/root/gem5/build/X86/gem5.opt --debug-flags=IEW,Rename,IQ,Fetch,Decode,Commit --debug-file=debug.out /root/gem5/configs/deprecated/example/se.py --cmd=/root/hw2/test  --cpu-type=DerivO3CPU --caches --l1d_size=64KiB --l1i_size=64KiB
+# scons build/X86/gem5.opt -j 8
+
+# /root/gem5/build/X86/gem5.opt --debug-flags=IEW,Rename,IQ,Fetch,Decode,Commit --debug-file=debug.out /root/gem5/configs/deprecated/example/se.py --cmd=/root/hw2/test  --cpu-type=DerivO3CPU --caches --l1d_size=64KiB --l1i_size=64KiB
 # /root/gem5/build/X86/gem5.opt --debug-flags=Rename --debug-file=debugOutput.txt /root/gem5/configs/deprecated/example/se.py --cmd=/root/hw2/test  --cpu-type=DerivO3CPU --caches --l1d_size=64KiB --l1i_size=64KiB
 # /root/gem5/build/X86/gem5.opt /root/gem5/configs/deprecated/example/se.py --cmd=/root/hw2/test  --cpu-type=DerivO3CPU --caches --l1d_size=64KiB --l1i_size=64KiB
-/root/gem5/build/X86/gem5.opt --debug-flags=Fetch --debug-file=debug.out /root/gem5/configs/deprecated/example/se.py --cmd=/root/hw2/test  --cpu-type=DerivO3CPU --caches --l1d_size=64KiB --l1i_size=64KiB
+/root/gem5/build/X86/gem5.opt /root/gem5/configs/deprecated/example/se.py --cmd=/root/hw2/test  --cpu-type=DerivO3CPU --caches --l1d_size=64KiB --l1i_size=64KiB
