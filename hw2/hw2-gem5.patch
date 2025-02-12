@@ -1,0 +1,187 @@
+diff --git a/.pre-commit-config.yaml b/.pre-commit-config.yaml
+index 03e39a3639..e71a0232b7 100644
+--- a/.pre-commit-config.yaml
++++ b/.pre-commit-config.yaml
+@@ -96,9 +96,9 @@ repos:
+             exclude: .*
+             language: system
+             description: The gem5 style checker hook.
+-          - id: gem5-commit-msg-checker
+-            name: gem5 commit msg checker
+-            entry: util/git-commit-msg.py
+-            language: system
+-            stages: [commit-msg]
+-            description: The gem5 commit message checker hook.
++          # - id: gem5-commit-msg-checker
++          #   name: gem5 commit msg checker
++          #   entry: util/git-commit-msg.py
++          #   language: system
++          #   stages: [commit-msg]
++          #   description: The gem5 commit message checker hook.
+diff --git a/src/arch/x86/isa/decoder/x87.isa b/src/arch/x86/isa/decoder/x87.isa
+index dc5840f61a..4f4410131b 100644
+--- a/src/arch/x86/isa/decoder/x87.isa
++++ b/src/arch/x86/isa/decoder/x87.isa
+@@ -44,7 +44,9 @@ format WarnUnimpl {
+             0x2: fcom();
+             0x3: fcomp();
+             0x4: Inst::FSUB1(Ed);
+-            0x5: fsubr();
++            0x5: BasicOperate::magicInst({{
++                printf("magicInst test (this is from x87.isa)\r\n");
++            }}, IsMagic);
+             0x6: Inst::FDIV1(Ed);
+             0x7: fdivr();
+         }
+diff --git a/src/cpu/StaticInstFlags.py b/src/cpu/StaticInstFlags.py
+index 2e02833d1a..0f4c18b73a 100644
+--- a/src/cpu/StaticInstFlags.py
++++ b/src/cpu/StaticInstFlags.py
+@@ -99,5 +99,6 @@ class StaticInstFlags(Enum):
+         "IsHtmStart",  # Starts a HTM transaction
+         "IsHtmStop",  # Stops (commits) a HTM transaction
+         "IsHtmCancel",  # Explicitely aborts a HTM transaction
++        "IsMagic",  # magic instructions cool!
+         "IsInvalid",  # An invalid instruction
+     ]
+diff --git a/src/cpu/o3/commit.cc b/src/cpu/o3/commit.cc
+index 1752fdc60a..72366aaf9c 100644
+--- a/src/cpu/o3/commit.cc
++++ b/src/cpu/o3/commit.cc
+@@ -1110,6 +1110,10 @@ Commit::commitHead(const DynInstPtr &head_inst, unsigned inst_num)
+ {
+     assert(head_inst);
+ 
++    if (head_inst->isMagic()) {
++        printf("Magic instruction is in the commit stage\n");
++    }
++
+     ThreadID tid = head_inst->threadNumber;
+ 
+     // If the instruction is not executed yet, then it will need extra
+@@ -1250,6 +1254,7 @@ Commit::commitHead(const DynInstPtr &head_inst, unsigned inst_num)
+     DPRINTF(Commit,
+             "[tid:%i] [sn:%llu] Committing instruction with PC %s\n",
+             tid, head_inst->seqNum, head_inst->pcState());
++
+     if (head_inst->traceData) {
+         head_inst->traceData->setFetchSeq(head_inst->seqNum);
+         head_inst->traceData->setCPSeq(thread[tid]->numOp);
+diff --git a/src/cpu/o3/decode.cc b/src/cpu/o3/decode.cc
+index ac728a2f2c..71d5dbf476 100644
+--- a/src/cpu/o3/decode.cc
++++ b/src/cpu/o3/decode.cc
+@@ -656,6 +656,10 @@ Decode::decodeInsts(ThreadID tid)
+         DPRINTF(Decode, "[tid:%i] Processing instruction [sn:%lli] with "
+                 "PC %s\n", tid, inst->seqNum, inst->pcState());
+ 
++        if (inst->isMagic()) {
++            printf("Magic instruction is in the decode stage\n");
++        }
++
+         if (inst->isSquashed()) {
+             DPRINTF(Decode, "[tid:%i] Instruction %i with PC %s is "
+                     "squashed, skipping.\n",
+diff --git a/src/cpu/o3/dyn_inst.hh b/src/cpu/o3/dyn_inst.hh
+index 9cb3d3caa9..0c57f80f17 100644
+--- a/src/cpu/o3/dyn_inst.hh
++++ b/src/cpu/o3/dyn_inst.hh
+@@ -558,6 +558,7 @@ class DynInst : public ExecContext, public RefCounted
+     bool isCondCtrl()     const { return staticInst->isCondCtrl(); }
+     bool isUncondCtrl()   const { return staticInst->isUncondCtrl(); }
+     bool isSerializing()  const { return staticInst->isSerializing(); }
++    bool isMagic()  const { return staticInst->isMagic(); }
+     bool
+     isSerializeBefore() const
+     {
+diff --git a/src/cpu/o3/fetch.cc b/src/cpu/o3/fetch.cc
+index b0bea842f5..7a411b77ee 100644
+--- a/src/cpu/o3/fetch.cc
++++ b/src/cpu/o3/fetch.cc
+@@ -1040,6 +1040,7 @@ Fetch::buildInst(ThreadID tid, StaticInstPtr staticInst,
+     DPRINTF(Fetch, "[tid:%i] Instruction is: %s\n", tid,
+             instruction->staticInst->disassemble(this_pc.instAddr()));
+ 
++
+ #if TRACING_ON
+     if (trace) {
+         instruction->traceData =
+@@ -1065,6 +1066,10 @@ Fetch::buildInst(ThreadID tid, StaticInstPtr staticInst,
+     // Keep track of if we can take an interrupt at this boundary
+     delayedCommit[tid] = instruction->isDelayedCommit();
+ 
++    if (instruction->isMagic()) {
++        printf("Magic instruction is in the fetch stage\n");
++    }
++
+     return instruction;
+ }
+ 
+diff --git a/src/cpu/o3/iew.cc b/src/cpu/o3/iew.cc
+index a8acb4c762..7731dbfad2 100644
+--- a/src/cpu/o3/iew.cc
++++ b/src/cpu/o3/iew.cc
+@@ -1121,6 +1121,10 @@ IEW::executeInsts()
+ 
+         DynInstPtr inst = instQueue.getInstToExecute();
+ 
++        if (inst->isMagic()) {
++            printf("Magic instruction is in the execute stage.\n");
++        }
++
+         DPRINTF(IEW, "Execute: Processing PC %s, [tid:%i] [sn:%llu].\n",
+                 inst->pcState(), inst->threadNumber,inst->seqNum);
+ 
+@@ -1352,6 +1356,10 @@ IEW::writebackInsts()
+         DynInstPtr inst = toCommit->insts[inst_num];
+         ThreadID tid = inst->threadNumber;
+ 
++        if (inst->isMagic()) {
++            printf("Magic instruction is in the writeback stage.\n");
++        }
++
+         DPRINTF(IEW, "Sending instructions to commit, [sn:%lli] PC %s.\n",
+                 inst->seqNum, inst->pcState());
+ 
+diff --git a/src/cpu/o3/inst_queue.cc b/src/cpu/o3/inst_queue.cc
+index b3cf330c37..e056d2d3fd 100644
+--- a/src/cpu/o3/inst_queue.cc
++++ b/src/cpu/o3/inst_queue.cc
+@@ -785,6 +785,10 @@ InstructionQueue::scheduleReadyInsts()
+ 
+         DynInstPtr issuing_inst = readyInsts[op_class].top();
+ 
++        if (issuing_inst->isMagic()) {
++            printf("Magic instruction is in the issue stage.\n");
++        }
++
+         if (issuing_inst->isFloating()) {
+             iqIOStats.fpInstQueueReads++;
+         } else if (issuing_inst->isVector()) {
+diff --git a/src/cpu/o3/rename.cc b/src/cpu/o3/rename.cc
+index 59a38aed45..5941ed7fa4 100644
+--- a/src/cpu/o3/rename.cc
++++ b/src/cpu/o3/rename.cc
+@@ -609,6 +609,10 @@ Rename::renameInsts(ThreadID tid)
+         //For store instruction, check SQ size and take into account the
+         //inflight stores
+ 
++        if (inst->isMagic()) {
++            printf("Magic instruction is the rename stage.\n");
++        }
++
+         if (inst->isLoad()) {
+             if (calcFreeLQEntries(tid) <= 0) {
+                 DPRINTF(Rename, "[tid:%i] Cannot rename due to no free LQ\n",
+diff --git a/src/cpu/static_inst.hh b/src/cpu/static_inst.hh
+index 78e47f4ed8..6d1f8ae06b 100644
+--- a/src/cpu/static_inst.hh
++++ b/src/cpu/static_inst.hh
+@@ -186,6 +186,7 @@ class StaticInst : public RefCounted, public StaticInstFlags
+     bool isSyscall() const { return flags[IsSyscall]; }
+     bool isMacroop() const { return flags[IsMacroop]; }
+     bool isMicroop() const { return flags[IsMicroop]; }
++    bool isMagic() const { return flags[IsMagic]; }
+     bool isDelayedCommit() const { return flags[IsDelayedCommit]; }
+     bool isLastMicroop() const { return flags[IsLastMicroop]; }
+     bool isFirstMicroop() const { return flags[IsFirstMicroop]; }
