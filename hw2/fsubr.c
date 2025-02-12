@@ -9,10 +9,12 @@ float reverse_subtract(float in1, float in2) {
 int main() {
     float in1, in2;
     float result;
+    float pi = 3.141592;
 
-    in1 = 3.141592;
-    in2 = 2*3.141592;
-    result = reverse_subtract(in1, in2);
-
-    printf("reverse_subtract(%f, %f) = %f\n", in1, in2, result);
+    for (int i = 0; i < 10; i++) {
+        in1 = pi;
+        in2 = i*pi;
+        result = reverse_subtract(in1, in2);
+        printf("reverse_subtract(%f, %f) = %f\n", in1, in2, result);
+    }
 }

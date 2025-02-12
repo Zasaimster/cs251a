@@ -11,7 +11,7 @@ CONFIG_DIR=$HW2_DIR/configs
 $GEM5_X86 \
     --outdir ${HW2_DIR}/m5out \
     ${CONFIG_DIR}/se_8width.py \
-    --cmd=${WORKSPACE}/build/hw2/test \
+    --cmd=${WORKSPACE}/build/hw2/fsubr \
     --cpu-type=DerivO3CPU \
     --caches \
     --l1d_size=64KiB \

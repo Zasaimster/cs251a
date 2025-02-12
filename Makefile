@@ -11,7 +11,7 @@ hw1: FORCE
 
 hw2: FORCE
 	mkdir -p ${BUILD_DIR}/hw2
-	x86_64-linux-gnu-gcc ${HW2_DIR}/test.c -o ${BUILD_DIR}/hw2/test ${CFLAGS}
+	x86_64-linux-gnu-gcc ${HW2_DIR}/fsubr.c -o ${BUILD_DIR}/hw2/fsubr ${CFLAGS}
 
 FORCE: ;
 
