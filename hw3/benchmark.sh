@@ -49,7 +49,7 @@ do
   echo "Running simulation with REPLACEMENT POLICY=$rp and CACHE ASSOCIATIVITY=16"
   make CACHE_REPL_TYPE=$rp CACHE_ASSOC=16 simall
 
-  Copy over all outputs to local directory
+  # Copy over all outputs to local directory
   for bm in "${bms[@]}"
   do
     cp -r $SPEC2017_DIR/benchspec/CPU/${bm}/run/run_base_refspeed_mytest-m64.0000/m5out $RES_DIR/${rp}/${bm}/16_assoc/
