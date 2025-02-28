@@ -15,7 +15,7 @@ def main():
     print(all_data)
     
     for benchmark in benchmarks:
-        for stat in ["hostInstRate", "system.cpu.ipc", "hostSeconds", "system.mem_ctrls.dram.readBursts"]:
+        for stat in ["hostInstRate", "system.switch_cpus.ipc", "hostSeconds", "system.mem_ctrls.dram.readBursts"]:
             compare_stat(stat_name=stat, benchmark_name=benchmark, data_source=all_data)
 
 
