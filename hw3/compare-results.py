@@ -14,13 +14,15 @@ def main():
     # print(all_data.xs("issueWidth2", level="config"))
     print(all_data)
     
-    for benchmark in benchmarks:
-        for stat in ["hostInstRate", "system.switch_cpus.ipc", "hostSeconds", "system.mem_ctrls.dram.readBursts"]:
-            compare_stat(stat_name=stat, benchmark_name=benchmark, data_source=all_data)
+    for c in configs:
+        for stat in ["system.switch_cpus.ipc", 
+                     "system.cpu.dcache.demandMissRate::total", 
+                     "system.cpu.dcache.demandAvgMissLatency::total"]:
+            compare_stat(stat_name=stat, name=c, data_source=all_data)
 
 
-def compare_stat(stat_name, benchmark_name, data_source: pd.DataFrame):
-    df : pd.DataFrame = data_source.xs(benchmark_name, level=1)[stat_name].unstack()
+def compare_stat(stat_name, name, data_source: pd.DataFrame):
+    df : pd.DataFrame = data_source[stat_name].xs(name, level=2).unstack().T
     print(df)
     
     ax = df.plot.bar(
@@ -30,7 +32,7 @@ def compare_stat(stat_name, benchmark_name, data_source: pd.DataFrame):
         rot=0,
         figsize=(10, 10)
     )
-    folder = f'{workspace_dir}/hw3/figures/{benchmark_name}'
+    folder = f'{workspace_dir}/hw3/figures/{name}'
     if not os.path.exists(folder): os.makedirs(folder)
     ax.figure.savefig(f'{folder}/{stat_name}.png')
 

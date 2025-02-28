@@ -14,8 +14,11 @@ hw2: FORCE
 	mkdir -p ${BUILD_DIR}/hw2
 	x86_64-linux-gnu-gcc ${HW2_DIR}/fsubr.c -o ${BUILD_DIR}/hw2/fsubr ${CFLAGS}
 
-hw3-plots: FORCE
+hw3: FORCE
 	python3 ${HW3_DIR}/compare-results.py
+
+clean-hw3:
+	rm -r ${HW3_DIR}/figures
 
 FORCE: ;
 
