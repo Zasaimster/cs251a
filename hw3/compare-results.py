@@ -15,14 +15,17 @@ def main():
     print(all_data)
     
     for c in configs:
-        for stat in ["system.switch_cpus.ipc", 
+        for stat in ["simSeconds",
+                     "system.switch_cpus.ipc", 
                      "system.cpu.dcache.demandMissRate::total", 
                      "system.cpu.dcache.demandAvgMissLatency::total"]:
             compare_stat(stat_name=stat, name=c, data_source=all_data)
 
 
 def compare_stat(stat_name, name, data_source: pd.DataFrame):
-    df : pd.DataFrame = data_source[stat_name].xs(name, level=2).unstack().T
+    df : pd.DataFrame = data_source[stat_name].xs(name, level=2).unstack()
+    df['average'] = df.mean(axis=1)
+    print(stat_name)
     print(df)
     
     ax = df.plot.bar(
